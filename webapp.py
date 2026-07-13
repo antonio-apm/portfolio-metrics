@@ -139,7 +139,7 @@ def main():
 
     st.subheader("Monte Carlo Study of Portfolio Tail Risk")
     st.write(
-        "Returns are assumed to be stationary, and are modeled through static probability distributions." \
+        "Returns are assumed to be stationary, and are modeled through static probability distributions. " \
         "Marginal distributions are modeled by one of Student-t, Laplace, GEV, or Normal parametric families. " \
         "Dependence is modeled by a Student-t or Gaussian copula. Specific model choices are done based on AIC. " \
         "Portfolio returns are simulated using the resulting random vector model."
