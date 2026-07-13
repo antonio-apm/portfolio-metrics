@@ -163,7 +163,7 @@ def main():
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Cumulative returns")
+        st.subheader("Cumulative Returns")
         try:
             import matplotlib.pyplot as plt
             
@@ -221,7 +221,7 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
         if len(tickers) > 1:
-            st.subheader("Risk-Return Tradeoff (Empirical)")
+            st.subheader("Risk-Return Tradeoff")
             try:
                 import matplotlib.pyplot as plt
                 from matplotlib.ticker import MultipleLocator
@@ -240,7 +240,15 @@ def main():
                 ax.grid(True, alpha=0.3)
                 rf = 0.0425
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
-                ax.text(ax.get_xlim()[1]-0.1, rf+0.025, " Risk-Free Rate (Historical Avg.)", color="blue", va="center", fontsize=9)
+                ax.annotate(
+                    "Risk-Free Rate",
+                    xy=(0.98, rf),
+                    xycoords=("axes fraction", "data"),
+                    ha="right",
+                    va="bottom",
+                    color="blue",
+                    fontsize=9,
+                )
                 ax.yaxis.set_major_locator(MultipleLocator(0.05))
                 fig.tight_layout()
                 st.pyplot(fig)
@@ -249,7 +257,7 @@ def main():
                 st.warning(f"Risk-Return plot unavailable: {exc}")
     
     with col2:
-        st.subheader("Correlation matrix (Empirical)")
+        st.subheader("Correlation Matrix")
         if len(tickers) > 1:
             try:
                 import matplotlib.pyplot as plt
@@ -258,7 +266,6 @@ def main():
                 corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
                 fig, ax = plt.subplots(figsize=(6.5, 5))
                 sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
-                ax.set_title('Portfolio Correlation Matrix')
                 fig.tight_layout()
                 st.pyplot(fig)
                 plt.close(fig)
