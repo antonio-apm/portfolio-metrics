@@ -1,5 +1,5 @@
 [logger]
-level = "error"
+level = "info"
 
 [client]
 showErrorDetails = true
@@ -12,4 +12,4 @@ primaryColor = "#1f77b4"
 backgroundColor = "#ffffff"
 secondaryBackgroundColor = "#f0f2f6"
 textColor = "#000000"
-font = "sans serif"
+font = "sans-serif"
