@@ -1,7 +1,5 @@
-import os
 from datetime import date, timedelta
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -153,6 +151,7 @@ def main():
     st.subheader("Monte Carlo tail-risk preview")
     if len(tickers) > 1:
         try:
+            import matplotlib.pyplot as plt
             simulator = portfolio.joint_simulator(holding="all", criterion="bic")
             mc_returns = simulator(n_samples=2000, random_state=42)
             mc_portfolio = mc_returns.dot(weights_array)
