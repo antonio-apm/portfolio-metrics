@@ -74,7 +74,7 @@ def main():
         st.header("Portfolio inputs")
         tickers_input = st.text_input(
             "Tickers",
-            value="GLD, XLE, VEA, META, TSLA, JPM, SPY",
+            value="GLD, XLE, VEA, META, JPM, SPY",
             help="Enter a comma-separated list of tickers, such as AAPL, MSFT, GOOGL.",
         )
         tickers = [ticker.strip().upper() for ticker in tickers_input.split(",") if ticker.strip()]
