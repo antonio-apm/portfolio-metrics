@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+import portfolio
+import importlib
+importlib.reload(portfolio)
 from portfolio import Portfolio
 
 

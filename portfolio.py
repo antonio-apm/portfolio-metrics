@@ -398,7 +398,7 @@ class Portfolio:
             "Normal": norm.ppf,
             "Student-t": student_t.ppf,
             "Laplace": laplace.ppf,
-            "GEV": genextreme.ppf,
+            "GEV": genextreme.ppf
         }
 
         marginal_specs = []
