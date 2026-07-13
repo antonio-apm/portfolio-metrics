@@ -494,9 +494,7 @@ class Portfolio:
             random_state: Seed for reproducibility.
         """
         if not hasattr(self, "_simulator"):
-            print("Calling joint_simulator to create a simulator...")
             simulate = self.joint_simulator()
-            print("Simulator created.")
 
         simulate = self._simulator
         simulated_returns = simulate(n_samples=n_samples, random_state=random_state)
