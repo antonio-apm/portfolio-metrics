@@ -514,7 +514,7 @@ class Portfolio:
         print(f"Monte Carlo estimate of {100*alpha:.2f}% expected shortfall (ES) is {100*es_estimate:.2f}%")
         print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
 
-        fig = plt.figure(figsize=(12, 8))
+        fig = plt.figure(figsize=(10, 5.5))
         portfolio_returns.hist(bins=50, density=True, alpha=0.5, color='grey')
         plt.axvline(es_estimate, color='red', linestyle='dashed', linewidth=2, label=f'ES({100*alpha:.2f}%)={100*es_estimate:.2f}%')
         plt.axvline(var_threshold, color='orange', linestyle='dashed', linewidth=2, label=f'VaR({100*alpha:.2f}%)={100*var_threshold:.2f}%')
