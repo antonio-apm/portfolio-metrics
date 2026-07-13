@@ -3,7 +3,6 @@ from datetime import date, timedelta
 import numpy as np
 import pandas as pd
 import streamlit as st
-import yfinance as yf
 
 from portfolio import Portfolio
 
@@ -13,6 +12,8 @@ st.set_page_config(page_title="Portfolio Metrics Dashboard", page_icon="📈", l
 
 @st.cache_data(show_spinner=False)
 def load_price_data(tickers, start_date, end_date, interval):
+    import yfinance as yf
+    
     data = yf.download(
         tickers=tickers,
         start=start_date,
