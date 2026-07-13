@@ -40,6 +40,17 @@ def load_price_data(tickers, start_date, end_date, interval):
     return data.sort_index()
 
 
+@st.cache_data(ttl=60*60*6)
+def get_risk_free_rate():
+    import yfinance as yf
+    data = yf.download("^TNX", period="5d", progress=False)
+    rf = data["Close"].dropna().iloc[-1]
+
+    if hasattr(rf, "iloc"):
+        rf = rf.iloc[0]
+
+    return float(rf) / 100
+
 @st.cache_data(show_spinner=False)
 def compute_portfolio_metrics(tickers, prices, weights, interval, log_returns, tail):
     portfolio = Portfolio(tickers=tickers, df=prices, weights=weights, interval=interval)
@@ -238,10 +249,10 @@ def main():
                 ax.set_xlabel(f'Tail Risk (ES)')
                 ax.set_ylabel('Mean Return (Annualized)')
                 ax.grid(True, alpha=0.3)
-                rf = 0.0425
+                rf = get_risk_free_rate()
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
                 ax.annotate(
-                    "Risk-Free Rate (Historical Avg.)",
+                    "10yr US Treasury Yield",
                     xy=(0.98, rf),
                     xycoords=("axes fraction", "data"),
                     ha="right",
