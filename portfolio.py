@@ -517,6 +517,8 @@ class Portfolio:
         z_val = norm.ppf(1 - alpha/2)
         es_ci = es_estimate + np.array([-1, 1]) * z_val * es_se
 
+        portfolio_returns = np.exp(portfolio_returns) - 1  # convert to % scale from log scale
+
         print(f"Monte Carlo estimate of ES({100*alpha:.2f}%) is {100*es_estimate:.2f}% with 95% CI: ({100*es_ci[0]:.4f}%, {100*es_ci[1]:.4f}%)")
         print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
 
