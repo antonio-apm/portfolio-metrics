@@ -217,51 +217,52 @@ def main():
     except Exception as exc:
         st.warning(f"Individual returns plot unavailable: {exc}")
 
-
-    if len(tickers) > 1:
-        st.subheader("Risk-Return Tradeoff")
-        try:
-            import matplotlib.pyplot as plt
-            from matplotlib.ticker import MultipleLocator
-            
-            # Find the ES row dynamically based on the tail parameter
-            es_label = f'ES({tail*100:.1f}%)'
-            
-            fig, ax = plt.subplots(figsize=(7, 4.5))
-            x = -summary.loc[es_label] 
-            y = summary.loc['Mean (Ann.)']
-            ax.scatter(x=x, y=y, s=100, alpha=0.6)
-            for col in summary.columns:
-                ax.text(x[col], y[col], col, fontsize=9, ha='center', va='bottom')
-            ax.set_xlabel(f'Tail Risk (ES)')
-            ax.set_ylabel('Mean Return (Annualized)')
-            ax.set_title('Empirical Risk-Return Tradeoff')
-            ax.grid(True, alpha=0.3)
-            rf = 0.0425
-            ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
-            ax.text(ax.get_xlim()[1], rf, " Risk-Free Rate", color="blue", va="center", fontsize=9)
-            ax.yaxis.set_major_locator(MultipleLocator(0.05))
-            fig.tight_layout()
-            st.pyplot(fig)
-            plt.close(fig)
-        except Exception as exc:
-            st.warning(f"Risk-Return plot unavailable: {exc}")
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if len(tickers) > 1:
+            st.subheader("Risk-Return Tradeoff (Empirical)")
+            try:
+                import matplotlib.pyplot as plt
+                from matplotlib.ticker import MultipleLocator
+                
+                # Find the ES row dynamically based on the tail parameter
+                es_label = f'ES({tail*100:.1f}%)'
+                
+                fig, ax = plt.subplots(figsize=(7, 4.5))
+                x = -summary.loc[es_label] 
+                y = summary.loc['Mean (Ann.)']
+                ax.scatter(x=x, y=y, s=100, alpha=0.6)
+                for col in summary.columns:
+                    ax.text(x[col], y[col], col, fontsize=9, ha='center', va='bottom')
+                ax.set_xlabel(f'Tail Risk (ES)')
+                ax.set_ylabel('Mean Return (Annualized)')
+                ax.grid(True, alpha=0.3)
+                rf = 0.0425
+                ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
+                ax.text(ax.get_xlim()[1], rf, " Risk-Free Rate", color="blue", va="center", fontsize=9)
+                ax.yaxis.set_major_locator(MultipleLocator(0.05))
+                fig.tight_layout()
+                st.pyplot(fig)
+                plt.close(fig)
+            except Exception as exc:
+                st.warning(f"Risk-Return plot unavailable: {exc}")
     
-    st.subheader("Correlation matrix")
-    if len(tickers) > 1:
-        try:
-            import matplotlib.pyplot as plt
-            import seaborn as sns
-            
-            corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
-            ax.set_title('Portfolio Correlation Matrix')
-            fig.tight_layout()
-            st.pyplot(fig)
-            plt.close(fig)
-        except Exception as exc:
-            st.warning(f"Correlation matrix unavailable: {exc}")
+    with col2:
+        st.subheader("Correlation matrix (Empirical)")
+        if len(tickers) > 1:
+            try:
+                import matplotlib.pyplot as plt
+                import seaborn as sns
+                
+                corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
+                fig, ax = plt.subplots(figsize=(8, 6))
+                sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
+                ax.set_title('Portfolio Correlation Matrix')
+                fig.tight_layout()
+                st.pyplot(fig)
+                plt.close(fig)
+            except Exception as exc:
+                st.warning(f"Correlation matrix unavailable: {exc}")
 
     st.subheader("Portfolio weights")
     weights_df = pd.DataFrame({"Ticker": tickers, "Weight": [weights.get(ticker, 0.0) for ticker in tickers]})
