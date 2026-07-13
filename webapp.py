@@ -121,6 +121,29 @@ def main():
     col2.metric("Date range", f"{start_date} → {end_date}")
     col3.metric("Interval", interval)
 
+    st.subheader("Monte Carlo tail-risk preview")
+    if len(tickers) > 1:
+        try:
+            import matplotlib.pyplot as plt
+            simulator = portfolio.joint_simulator(holding="all", criterion="bic")
+            mc_returns = simulator(n_samples=2000, random_state=42)
+            weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
+            mc_portfolio = mc_returns.dot(weights_array)
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.hist(mc_portfolio, bins=50, density=True, alpha=0.6, color="steelblue", edgecolor="black")
+            ax.axvline(np.quantile(mc_portfolio, 0.05), color="red", linestyle="--", linewidth=2, label="5% VaR")
+            ax.axvline(mc_portfolio.mean(), color="green", linestyle="--", linewidth=2, label="Mean")
+            ax.set_title("Simulated portfolio return distribution", fontsize=14, fontweight="bold")
+            ax.set_xlabel("Portfolio return", fontsize=12)
+            ax.set_ylabel("Density", fontsize=12)
+            ax.legend(loc="upper left", fontsize=11)
+            fig.tight_layout()
+            st.pyplot(fig)
+        except Exception as exc:
+            st.info(f"Monte Carlo preview is unavailable for this selection: {exc}")
+    else:
+        st.info("Monte Carlo tail-risk preview requires at least two tickers.")
+
     st.subheader("Portfolio overview")
     st.write(
         "This screen uses the existing portfolio analysis module to summarize returns, volatility, tail risk, and portfolio-level behavior."
@@ -148,27 +171,6 @@ def main():
     st.subheader("Portfolio weights")
     weights_df = pd.DataFrame({"Ticker": tickers, "Weight": [weights.get(ticker, 0.0) for ticker in tickers]})
     st.dataframe(weights_df, use_container_width=True)
-
-    st.subheader("Monte Carlo tail-risk preview")
-    if len(tickers) > 1:
-        try:
-            import matplotlib.pyplot as plt
-            simulator = portfolio.joint_simulator(holding="all", criterion="bic")
-            mc_returns = simulator(n_samples=2000, random_state=42)
-            mc_portfolio = mc_returns.dot(weights_array)
-            fig, ax = plt.subplots(figsize=(8, 5))
-            ax.hist(mc_portfolio, bins=50, density=True, alpha=0.6, color="steelblue")
-            ax.axvline(np.quantile(mc_portfolio, 0.05), color="red", linestyle="--", label="5% VaR")
-            ax.axvline(mc_portfolio.mean(), color="green", linestyle="--", label="Mean")
-            ax.set_title("Simulated portfolio return distribution")
-            ax.set_xlabel("Portfolio return")
-            ax.set_ylabel("Density")
-            ax.legend()
-            st.pyplot(fig)
-        except Exception as exc:
-            st.info(f"Monte Carlo preview is unavailable for this selection: {exc}")
-    else:
-        st.info("Monte Carlo tail-risk preview requires at least two tickers.")
 
 
 if __name__ == "__main__":
