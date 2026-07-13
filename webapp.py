@@ -62,8 +62,6 @@ def parse_weights(raw_weights, tickers):
     return weights
 
 
-def normalize_prices(prices):
-    return prices / prices.iloc[0]
 
 
 def main():
@@ -158,14 +156,67 @@ def main():
         "This screen uses the existing portfolio analysis module to summarize returns, volatility, tail risk, and portfolio-level behavior."
     )
 
-    st.subheader("Price evolution")
-    normalized = normalize_prices(prices)
-    st.line_chart(normalized)
-
     st.subheader("Risk and return summary")
     summary_display = summary.copy()
     summary_display.index = [str(idx) for idx in summary_display.index]
     st.dataframe(summary_display, use_container_width=True)
+
+    st.subheader("Cumulative returns")
+    try:
+        import matplotlib.pyplot as plt
+        
+        # Calculate cumulative returns
+        cum_rets = prices.apply(lambda x: 100 * (x / x.iloc[0] - 1))
+        portfolio_returns = returns.dot(weights_array)
+        portfolio_cumulative = ((1 + portfolio_returns).cumprod() - 1) * 100
+        
+        fig, ax = plt.subplots(figsize=(8, 4))
+        cum_rets.plot(
+            ax=ax,
+            title="Cumulative Returns: Individual Holdings vs Portfolio",
+            xlabel="Date",
+            ylabel="Cumulative Return (%)",
+            alpha=0.5,
+            legend=True
+        )
+        
+        portfolio_cumulative.plot(
+            ax=ax,
+            linewidth=3,
+            color="black",
+            label="Portfolio"
+        )
+        
+        ax.legend(loc='best')
+        fig.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    except Exception as exc:
+        st.warning(f"Cumulative returns plot unavailable: {exc}")
+    
+    st.subheader("Returns of Individual Holdings")
+    try:
+        import matplotlib.pyplot as plt
+
+        individual_returns = prices.pct_change().dropna() * 100
+
+        fig, ax = plt.subplots(figsize=(7, 3.5))
+
+        individual_returns.plot(ax=ax)
+
+        ax.set_title("Returns")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Return (%)")
+        ax.axhline(0, color="black", linewidth=0.8, alpha=0.6)
+        ax.legend(title="Security", loc="best")
+        fig.tight_layout()
+
+        st.pyplot(fig)
+        plt.close(fig)
+
+    except Exception as exc:
+        st.warning(f"Individual returns plot unavailable: {exc}")
+
 
     if len(tickers) > 1:
         st.subheader("Risk-Return Tradeoff")
@@ -176,7 +227,7 @@ def main():
             # Find the ES row dynamically based on the tail parameter
             es_label = f'ES({tail*100:.1f}%)'
             
-            fig, ax = plt.subplots(figsize=(7, 4.5))
+            fig, ax = plt.subplots(figsize=(5, 2.5))
             x = -summary.loc[es_label] 
             y = summary.loc['Mean (Ann.)']
             ax.scatter(x=x, y=y, s=100, alpha=0.6)
@@ -203,7 +254,7 @@ def main():
             import seaborn as sns
             
             corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
-            fig, ax = plt.subplots(figsize=(8, 6))
+            fig, ax = plt.subplots(figsize=(5, 4))
             sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
             ax.set_title('Portfolio Correlation Matrix')
             fig.tight_layout()
@@ -211,39 +262,6 @@ def main():
             plt.close(fig)
         except Exception as exc:
             st.warning(f"Correlation matrix unavailable: {exc}")
-    
-    st.subheader("Cumulative returns")
-    try:
-        import matplotlib.pyplot as plt
-        
-        # Calculate cumulative returns
-        cum_rets = prices.apply(lambda x: 100 * (x / x.iloc[0] - 1))
-        portfolio_returns = returns.dot(weights_array)
-        portfolio_cumulative = ((1 + portfolio_returns).cumprod() - 1) * 100
-        
-        fig, ax = plt.subplots(figsize=(10, 5))
-        cum_rets.plot(
-            ax=ax,
-            title="Cumulative Returns: Individual Holdings vs Portfolio",
-            xlabel="Date",
-            ylabel="Cumulative Return (%)",
-            alpha=0.5,
-            legend=True
-        )
-        
-        portfolio_cumulative.plot(
-            ax=ax,
-            linewidth=3,
-            color="black",
-            label="Portfolio"
-        )
-        
-        ax.legend(loc='best')
-        fig.tight_layout()
-        st.pyplot(fig)
-        plt.close(fig)
-    except Exception as exc:
-        st.warning(f"Cumulative returns plot unavailable: {exc}")
 
     st.subheader("Portfolio weights")
     weights_df = pd.DataFrame({"Ticker": tickers, "Weight": [weights.get(ticker, 0.0) for ticker in tickers]})
