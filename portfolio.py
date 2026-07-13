@@ -506,18 +506,14 @@ class Portfolio:
 
         weights_array = np.array([self.weights.get(asset, 0) for asset in simulated_returns.columns])
         portfolio_returns = simulated_returns.dot(weights_array) 
-
+        portfolio_returns = np.exp(portfolio_returns) - 1 # convert to % scale from log
         var_threshold = np.quantile(portfolio_returns, alpha) 
         es_array = portfolio_returns[portfolio_returns <= var_threshold]
-        es_array = np.exp(es_array) - 1  # convert to % scale from log scale
-
+        
         es_estimate = es_array.mean()
-        es_se = es_array.std() / n_samples 
-
+        es_se = es_array.std() / np.sqrt(n_samples)
         z_val = norm.ppf(1 - alpha/2)
-        es_ci = es_estimate + np.array([-1, 1]) * z_val * es_se
-
-        portfolio_returns = np.exp(portfolio_returns) - 1  # convert to % scale from log scale
+        es_ci = es_estimate + np.array([-1, 1]) * z_val * es_se 
 
         print(f"Monte Carlo estimate of ES({100*alpha:.2f}%) is {100*es_estimate:.2f}% with 95% CI: ({100*es_ci[0]:.4f}%, {100*es_ci[1]:.4f}%)")
         print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
