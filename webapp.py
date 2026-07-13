@@ -173,13 +173,16 @@ def main():
             import matplotlib.pyplot as plt
             from matplotlib.ticker import MultipleLocator
             
+            # Find the ES row dynamically based on the tail parameter
+            es_label = f'ES({tail*100:.1f}%)'
+            
             fig, ax = plt.subplots(figsize=(8, 6))
-            x = -summary.loc['ES(5.0%)'] 
+            x = -summary.loc[es_label] 
             y = summary.loc['Mean (Ann.)']
             ax.scatter(x=x, y=y, s=100, alpha=0.6)
             for col in summary.columns:
                 ax.text(x[col], y[col], col, fontsize=9, ha='center', va='bottom')
-            ax.set_xlabel('Tail Risk (5% Expected Shortfall)')
+            ax.set_xlabel(f'Tail Risk ({es_label})')
             ax.set_ylabel('Mean Return (Annualized)')
             ax.set_title('Risk-Return Tradeoff by Asset')
             ax.grid(True, alpha=0.3)
@@ -224,7 +227,7 @@ def main():
             title="Cumulative Returns: Individual Holdings vs Portfolio",
             xlabel="Date",
             ylabel="Cumulative Return (%)",
-            alpha=0.3,
+            alpha=0.5,
             legend=True
         )
         
