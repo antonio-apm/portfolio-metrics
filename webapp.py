@@ -76,8 +76,8 @@ def parse_weights(raw_weights, tickers):
 
 
 def main():
-    st.title("Portfolio Metrics Dashboard")
-    st.caption("Analyze portfolio risk, return behavior, and dependence with the project’s existing analytics code.")
+    st.title("Portfolio Dashboard")
+    st.caption("Analyze portfolio performance and risk through auto-calibrated simulations, visualizations, and empirical statistics.")
 
     with st.sidebar:
         st.header("Portfolio inputs")
@@ -137,7 +137,13 @@ def main():
 
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
-    st.subheader("Monte Carlo study of portfolio returns")
+    st.subheader("Monte Carlo Study of Portfolio Tail Risk")
+    st.write(
+        "Returns are assumed to be stationary, and are modeled through static probability distributions." \
+        "Marginal distributions are modeled by one of Student-t, Laplace, GEV, or Normal parametric families. " \
+        "Dependence is modeled by a Student-t or Gaussian copula. Specific model choices are done based on AIC. " \
+        "Portfolio returns are simulated using the resulting random vector model."
+    )
     if len(tickers) > 1:
         try:
             import matplotlib.pyplot as plt
@@ -164,7 +170,7 @@ def main():
 
     st.subheader("Portfolio overview")
     st.write(
-        "This screen uses the existing portfolio analysis module to summarize returns, volatility, tail risk, and portfolio-level behavior."
+        "The following tabs show various descriptive statistics using the empirical portfolio data."
     )
 
     st.subheader("Risk and return summary")
@@ -263,6 +269,9 @@ def main():
                 ax.yaxis.set_major_locator(MultipleLocator(0.05))
                 fig.tight_layout()
                 st.pyplot(fig)
+                st.caption(
+                    f"Expected Shortfall (ES) is reported on the same time scale selected in the sidebar"
+                )
                 plt.close(fig)
             except Exception as exc:
                 st.warning(f"Risk-Return plot unavailable: {exc}")
