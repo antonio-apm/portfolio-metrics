@@ -511,8 +511,9 @@ class Portfolio:
         es_estimate = es_array.mean()
         es_se = es_array.std() / np.sqrt(n_samples)
 
-        print(f"Monte Carlo estimate of {100*alpha:.2f}% expected shortfall (ES) is {100*es_estimate:.2f}%")
-        print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
+        print(f"Monte Carlo estimate of {100*alpha:.1f}% expected shortfall (ES) is {100*es_estimate:.2f}%.")
+        print(f"What does this mean? In the worst {100*alpha:.1f}% of cases, we expect to lose {100*es_estimate:.2f}%.")
+        print(f"Standard Error of ES estimate: {100*es_se:.5f}%.")
 
         fig = plt.figure(figsize=(10, 5.5))
         portfolio_returns.hist(bins=50, density=True, alpha=0.5, color='grey')
