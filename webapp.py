@@ -4,9 +4,6 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-import portfolio
-import importlib
-importlib.reload(portfolio)
 from portfolio import Portfolio
 
 
@@ -77,7 +74,7 @@ def main():
         st.header("Portfolio inputs")
         tickers_input = st.text_input(
             "Tickers",
-            value="AAPL, MSFT, GOOGL",
+            value="GLD, XLE, VEA, META, TSLA, JPM, SPY",
             help="Enter a comma-separated list of tickers, such as AAPL, MSFT, GOOGL.",
         )
         tickers = [ticker.strip().upper() for ticker in tickers_input.split(",") if ticker.strip()]
@@ -86,23 +83,28 @@ def main():
             st.warning("Please enter at least one ticker.")
             st.stop()
 
-        start_date = st.date_input("Start date", value=date.today() - timedelta(days=365 * 3))
+        start_date = st.date_input("Start date", value=date.today() - timedelta(days=365 * 10))
         end_date = st.date_input("End date", value=date.today())
 
         interval = st.selectbox(
             "Time interval",
             options=["1d", "1wk", "1mo"],
-            index=0,
+            index=2,
             help="Choose the data frequency used for the analysis.",
         )
 
+        # Default weights as equal-weighted
+        num_tickers = len(tickers)
+        default_weights = ", ".join([f"{1/num_tickers:.2f}" for _ in range(num_tickers)])
+        
         weights_input = st.text_input(
             "Portfolio weights",
-            value="",
+            value=default_weights,
             help="Optional. Enter comma-separated weights matching the ticker list, for example 0.5,0.3,0.2.",
         )
+        st.caption("💡 Default: equal weights across all tickers")
         log_returns = st.checkbox("Use log returns", value=True)
-        tail = st.slider("Tail risk quantile", min_value=0.01, max_value=0.2, value=0.05, step=0.01)
+        tail = st.slider("Tail risk quantile", min_value=0.005, max_value=0.2, value=0.01, step=0.005)
 
     try:
         weights = parse_weights(weights_input, tickers)
@@ -166,13 +168,79 @@ def main():
     st.dataframe(summary_display, use_container_width=True)
 
     if len(tickers) > 1:
-        st.subheader("Correlation matrix")
-        corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
-        st.dataframe(corr, use_container_width=True)
-
-    st.subheader("Weighted portfolio returns")
-    portfolio_returns = returns.dot(weights_array)
-    st.line_chart(pd.DataFrame({"Portfolio Returns": (1 + portfolio_returns).cumprod()}))
+        st.subheader("Risk-Return Tradeoff")
+        try:
+            import matplotlib.pyplot as plt
+            from matplotlib.ticker import MultipleLocator
+            
+            fig, ax = plt.subplots(figsize=(8, 6))
+            x = -summary.loc['ES(5.0%)'] 
+            y = summary.loc['Mean (Ann.)']
+            ax.scatter(x=x, y=y, s=100, alpha=0.6)
+            for col in summary.columns:
+                ax.text(x[col], y[col], col, fontsize=9, ha='center', va='bottom')
+            ax.set_xlabel('Tail Risk (5% Expected Shortfall)')
+            ax.set_ylabel('Mean Return (Annualized)')
+            ax.set_title('Risk-Return Tradeoff by Asset')
+            ax.grid(True, alpha=0.3)
+            rf = 0.0425
+            ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
+            ax.text(ax.get_xlim()[1], rf, " Risk-Free Rate", color="blue", va="center", fontsize=9)
+            ax.yaxis.set_major_locator(MultipleLocator(0.05))
+            fig.tight_layout()
+            st.pyplot(fig)
+            plt.close(fig)
+        except Exception as exc:
+            st.warning(f"Risk-Return plot unavailable: {exc}")
+    
+    st.subheader("Correlation matrix")
+    if len(tickers) > 1:
+        try:
+            import matplotlib.pyplot as plt
+            import seaborn as sns
+            
+            corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
+            fig, ax = plt.subplots(figsize=(10, 8))
+            sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
+            ax.set_title('Portfolio Correlation Matrix')
+            fig.tight_layout()
+            st.pyplot(fig)
+            plt.close(fig)
+        except Exception as exc:
+            st.warning(f"Correlation matrix unavailable: {exc}")
+    
+    st.subheader("Cumulative returns")
+    try:
+        import matplotlib.pyplot as plt
+        
+        # Calculate cumulative returns
+        cum_rets = prices.apply(lambda x: 100 * (x / x.iloc[0] - 1))
+        portfolio_returns = returns.dot(weights_array)
+        portfolio_cumulative = ((1 + portfolio_returns).cumprod() - 1) * 100
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        cum_rets.plot(
+            ax=ax,
+            title="Cumulative Returns: Individual Holdings vs Portfolio",
+            xlabel="Date",
+            ylabel="Cumulative Return (%)",
+            alpha=0.3,
+            legend=True
+        )
+        
+        portfolio_cumulative.plot(
+            ax=ax,
+            linewidth=3,
+            color="black",
+            label="Portfolio"
+        )
+        
+        ax.legend(loc='best')
+        fig.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    except Exception as exc:
+        st.warning(f"Cumulative returns plot unavailable: {exc}")
 
     st.subheader("Portfolio weights")
     weights_df = pd.DataFrame({"Ticker": tickers, "Weight": [weights.get(ticker, 0.0) for ticker in tickers]})
