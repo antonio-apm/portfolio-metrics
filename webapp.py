@@ -240,7 +240,7 @@ def main():
                 ax.grid(True, alpha=0.3)
                 rf = 0.0425
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
-                ax.text(ax.get_xlim()[1], rf, " Risk-Free Rate", color="blue", va="center", fontsize=9)
+                ax.text(ax.get_xlim()[1]-0.1, rf, " Risk-Free Rate (Historical Avg.)", color="blue", va="center", fontsize=9)
                 ax.yaxis.set_major_locator(MultipleLocator(0.05))
                 fig.tight_layout()
                 st.pyplot(fig)
