@@ -121,13 +121,14 @@ def main():
     col2.metric("Date range", f"{start_date} → {end_date}")
     col3.metric("Interval", interval)
 
+    weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
+
     st.subheader("Monte Carlo tail-risk preview")
     if len(tickers) > 1:
         try:
             import matplotlib.pyplot as plt
             simulator = portfolio.joint_simulator(holding="all", criterion="bic")
             mc_returns = simulator(n_samples=2000, random_state=42)
-            weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
             mc_portfolio = mc_returns.dot(weights_array)
             fig, ax = plt.subplots(figsize=(10, 6))
             ax.hist(mc_portfolio, bins=50, density=True, alpha=0.6, color="steelblue", edgecolor="black")
@@ -164,7 +165,6 @@ def main():
         st.dataframe(corr, use_container_width=True)
 
     st.subheader("Weighted portfolio returns")
-    weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
     portfolio_returns = returns.dot(weights_array)
     st.line_chart(pd.DataFrame({"Portfolio Returns": (1 + portfolio_returns).cumprod()}))
 
