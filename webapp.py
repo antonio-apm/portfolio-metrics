@@ -241,7 +241,7 @@ def main():
                 rf = 0.0425
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
                 ax.annotate(
-                    "Risk-Free Rate",
+                    "Risk-Free Rate (Historical Avg.)",
                     xy=(0.98, rf),
                     xycoords=("axes fraction", "data"),
                     ha="right",
