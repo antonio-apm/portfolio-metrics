@@ -520,7 +520,7 @@ class Portfolio:
         print(f"Monte Carlo estimate of ES({100*alpha:.2f}%) is {100*es_estimate:.2f}% with 95% CI: ({100*es_ci[0]:.4f}%, {100*es_ci[1]:.4f}%)")
         print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
 
-        plt.figure(figsize=(12, 8))
+        fig = plt.figure(figsize=(12, 8))
         portfolio_returns.hist(bins=50, density=True, alpha=0.5, color='grey')
         plt.axvline(es_estimate, color='red', linestyle='dashed', linewidth=2, label=f'ES({100*alpha:.2f}%)={100*es_estimate:.2f}%')
         plt.axvline(var_threshold, color='orange', linestyle='dashed', linewidth=2, label=f'VaR({100*alpha:.2f}%)={100*var_threshold:.2f}%')
@@ -552,9 +552,8 @@ class Portfolio:
         plt.title(f"Monte Carlo Simulation of Portfolio Returns (n={n_samples})")
         plt.xlabel("Portfolio Returns")
         plt.ylabel("Density")
-        plt.show()
 
-        return pd.DataFrame({
+        return fig, pd.DataFrame({
             "Est": [es_estimate],
             "SE": [es_se],
             "CI": [(es_ci[0], es_ci[1])]

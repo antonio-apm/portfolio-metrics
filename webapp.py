@@ -123,25 +123,28 @@ def main():
 
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
-    st.subheader("Monte Carlo tail-risk preview")
+    st.subheader("Monte Carlo study of portfolio returns")
     if len(tickers) > 1:
         try:
             import matplotlib.pyplot as plt
-            simulator = portfolio.joint_simulator(holding="all", criterion="bic")
-            mc_returns = simulator(n_samples=2000, random_state=42)
-            mc_portfolio = mc_returns.dot(weights_array)
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.hist(mc_portfolio, bins=50, density=True, alpha=0.6, color="steelblue", edgecolor="black")
-            ax.axvline(np.quantile(mc_portfolio, 0.05), color="red", linestyle="--", linewidth=2, label="5% VaR")
-            ax.axvline(mc_portfolio.mean(), color="green", linestyle="--", linewidth=2, label="Mean")
-            ax.set_title("Simulated portfolio return distribution", fontsize=14, fontweight="bold")
-            ax.set_xlabel("Portfolio return", fontsize=12)
-            ax.set_ylabel("Density", fontsize=12)
-            ax.legend(loc="upper left", fontsize=11)
-            fig.tight_layout()
+            import io
+            import contextlib
+            
+            # Capture print output from monte_carlo_ES
+            f = io.StringIO()
+            with contextlib.redirect_stdout(f):
+                fig, mc_results = portfolio.monte_carlo_ES(n_samples=int(1e5), alpha=0.01)
+            
+            # Display the captured stats
+            stats_output = f.getvalue()
+            if stats_output:
+                st.text(stats_output)
+            
+            # Display the figure
             st.pyplot(fig)
+            plt.close(fig)
         except Exception as exc:
-            st.info(f"Monte Carlo preview is unavailable for this selection: {exc}")
+            st.error(f"Monte Carlo analysis failed: {exc}")
     else:
         st.info("Monte Carlo tail-risk preview requires at least two tickers.")
 
