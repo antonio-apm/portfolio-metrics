@@ -1,0 +1,8 @@
+[logger]
+level = "error"
+
+[client]
+showErrorDetails = true
+
+[server]
+headless = true
