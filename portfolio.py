@@ -549,8 +549,7 @@ class Portfolio:
 
         return fig, pd.DataFrame({
             "Est": [es_estimate],
-            "SE": [es_se],
-            "CI": [(es_ci[0], es_ci[1])]
+            "SE": [es_se]
             })
 
 
