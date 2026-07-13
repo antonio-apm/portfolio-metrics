@@ -509,20 +509,18 @@ class Portfolio:
         portfolio_returns = np.exp(portfolio_returns) - 1 # convert to % scale from log
         var_threshold = np.quantile(portfolio_returns, alpha) 
         es_array = portfolio_returns[portfolio_returns <= var_threshold]
-        
+
         es_estimate = es_array.mean()
         es_se = es_array.std() / np.sqrt(n_samples)
-        z_val = norm.ppf(1 - alpha/2)
-        es_ci = es_estimate + np.array([-1, 1]) * z_val * es_se 
 
-        print(f"Monte Carlo estimate of ES({100*alpha:.2f}%) is {100*es_estimate:.2f}% with 95% CI: ({100*es_ci[0]:.4f}%, {100*es_ci[1]:.4f}%)")
-        print(f"Standard Error of ES estimate: {100*es_se:.6f}%")
+        print(f"Monte Carlo estimate of {100*alpha:.2f}% expected shortfall (ES) is ${100*es_estimate:.2f}%$")
+        print(f"Standard Error of ES estimate: ${100*es_se:.6f}%$")
 
         fig = plt.figure(figsize=(12, 8))
         portfolio_returns.hist(bins=50, density=True, alpha=0.5, color='grey')
-        plt.axvline(es_estimate, color='red', linestyle='dashed', linewidth=2, label=f'ES({100*alpha:.2f}%)={100*es_estimate:.2f}%')
-        plt.axvline(var_threshold, color='orange', linestyle='dashed', linewidth=2, label=f'VaR({100*alpha:.2f}%)={100*var_threshold:.2f}%')
-        plt.axvline(portfolio_returns.mean(), color='green', linestyle='dashed', linewidth=2, label=f'Mean={100*portfolio_returns.mean():.2f}%')
+        plt.axvline(es_estimate, color='red', linestyle='dashed', linewidth=2, label=f'ES({100*alpha:.2f}%)=${100*es_estimate:.2f}%$')
+        plt.axvline(var_threshold, color='orange', linestyle='dashed', linewidth=2, label=f'VaR({100*alpha:.2f}%)=${100*var_threshold:.2f}%$')
+        plt.axvline(portfolio_returns.mean(), color='green', linestyle='dashed', linewidth=2, label=f'Mean=${100*portfolio_returns.mean():.2f}%$')
         skew = portfolio_returns.skew()
         kurtosis = portfolio_returns.kurtosis()
         plt.text(
