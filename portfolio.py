@@ -539,12 +539,7 @@ class Portfolio:
             color="brown"
         )
         plt.legend()
-        plt.title(f"Monte Carlo Simulation of Portfolio Returns (n={n_samples})")
-        plt.xlabel("Portfolio Returns")
-        plt.ylabel("Frequency")
-
-        plt.legend()
-        plt.title(f"Monte Carlo Simulation of Portfolio Returns (n={n_samples})")
+        plt.title(f"Monte Carlo Simulation of {self.interval} Portfolio Returns (n={n_samples})")
         plt.xlabel("Portfolio Returns")
         plt.ylabel("Density")
 
