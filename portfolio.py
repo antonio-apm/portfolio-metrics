@@ -116,7 +116,7 @@ class Portfolio:
             "1mo": 12
         }.get(self.interval, 1)
 
-        weights = self.weights.reindex(df.columns)
+        weights = pd.Series(self.weights, dtype=float).reindex(df.columns)
 
         if weights.isna().any():
             missing = weights[weights.isna()].index.tolist()
