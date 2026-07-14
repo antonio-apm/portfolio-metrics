@@ -53,7 +53,7 @@ def get_risk_free_rate():
 
 @st.cache_data(show_spinner=False)
 def compute_portfolio_metrics(tickers, prices, weights, interval, tail):
-    portfolio = Portfolio(tickers=tickers, df=prices, weights=weights, interval=interval)
+    portfolio = Portfolio(tickers=tickers, df=prices, weights=weights, interval=interval, rf=get_risk_free_rate())
     summary = portfolio.uni_summary(tail=tail)
     returns = portfolio.returns().dropna()
     return portfolio, summary, returns
@@ -254,7 +254,7 @@ def main():
                 ax.set_xlabel(f'Tail Risk (ES)')
                 ax.set_ylabel('Mean Return (Annualized)')
                 ax.grid(True, alpha=0.3)
-                rf = get_risk_free_rate()
+                rf = portfolio.rf
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
                 ax.annotate(
                     "10yr US Treasury Yield",

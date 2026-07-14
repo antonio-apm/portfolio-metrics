@@ -70,14 +70,16 @@ class Portfolio:
         self.weights (optional) is a dictionary with ticker keys and portfolio weight values
         self.data is a DataFrame of price data for the securities in the portfolio
         self.interval is the data interval (e.g., "1d", "1mo") used for the price data
+        self.rf is the risk-free rate (e.g. the 10yr US Treasury yield).
 
     '''
 
-    def __init__(self, tickers, df, weights={},interval="1d"):
+    def __init__(self, tickers, df, weights={},interval="1d", rf=0.05):
         self.tickers = tickers
         self.weights = weights
         self.data = df
         self.interval = interval
+        self.rf = rf
 
     def holding_data(self, holding):
         df = self.data
@@ -96,37 +98,69 @@ class Portfolio:
             return np.log(df).diff().dropna()
         else:
             return df.pct_change().dropna()
-        
 
-    def uni_summary(self, holding='all', log=True, tail=0.05):
-        '''
-        Returns a univariate summary of the returns of each security (individually), including:
-            - the annualized mean and volatility, 
-            - the skew and excess kurtosis, and 
-            - some tail risk metrics (VaR, ES/CVaR, MaxDD).
-        '''
-        df = self.returns(holding=holding, log=log)
-        means = df.mean()
 
-        scale = 252 if self.interval == "1d" else 12 if self.interval == "1mo" else 1
+    def uni_summary(self, holding="all", tail=0.05):
+        """
+        Return sample summary statistics for the weighted portfolio and
+        each individual security, calculated using simple returns.
+        """
+        if not 0 < tail < 1:
+            raise ValueError("tail must be between 0 and 1.")
 
-        d = {}
-        if log:
-            d['Mean (Ann.)'] = means * scale
-        else: 
-            d['Mean (Ann.)'] = (1 + means)**scale - 1 
-            # Note: this is equivalent to the expression in the log=True case
-            #       although we break up the cases to take advantage of the
-            #       simplified formula for log=True.
-        d['Volatility (Ann.)'] = df.std() * np.sqrt(scale)
-        d['Skew'] = df.skew()
-        d['Kurtosis (Excess)'] = df.kurtosis()
-        d[f'VaR({tail*100:.1f}%)'] = df.quantile(tail) 
-        d[f'ES({tail*100:.1f}%)'] = df.apply(lambda col: col[col <= col.quantile(tail)].mean())
-        d[f'MaxDD'] = max_drawdown( (1+df).cumprod() )
+        df = self.returns(holding=holding, log=False)
 
-        return pd.DataFrame(d).T
-    
+        scale = {
+            "1d": 252, 
+            "1w": 52, 
+            "1mo": 12
+        }.get(self.interval, 1)
+
+        weights = self.weights.reindex(df.columns)
+
+        if weights.isna().any():
+            missing = weights[weights.isna()].index.tolist()
+            raise ValueError(f"Missing portfolio weights for: {missing}")
+
+        weights = weights / weights.sum()
+
+        portfolio_returns = df.mul(weights, axis="columns").sum(axis=1)
+        portfolio_returns.name = "Portfolio"
+
+        # Portfolio appears first
+        df = pd.concat([portfolio_returns, df], axis=1)
+
+        periodic_mean = df.mean()
+        annual_mean = periodic_mean * scale
+        annual_vol = df.std() * np.sqrt(scale)
+
+        # Minimum acceptable return of zero
+        downside_returns = df.clip(upper=0)
+        downside_dev = np.sqrt(
+            downside_returns.pow(2).mean()
+        ) * np.sqrt(scale)
+
+        var = df.quantile(tail)
+        es = df.apply(
+            lambda col: col[col <= col.quantile(tail)].mean()
+        )
+
+        wealth = (1 + df).cumprod()
+
+        results = {
+            "Mean (Annual)": annual_mean,
+            "Volatility (Annual)": annual_vol,
+            "Sharpe (Annual)": (annual_mean - self.rf) / annual_vol,
+            "Sortino (Annual)": (annual_mean - self.rf) / downside_dev,
+            f"Skew ({self.interval})": df.skew(),
+            f"Excess Kurtosis ({self.interval})": df.kurtosis(),
+            f"{tail * 100:.1f}% VaR ({self.interval})": var,
+            f"{tail * 100:.1f}% ES ({self.interval})": es,
+            "Max Drawdown": max_drawdown(wealth)
+        }
+
+        return pd.DataFrame(results).T
+
 
     def dependence(self, type="corr", holding="all", log=True, tail=0.05):
         """
