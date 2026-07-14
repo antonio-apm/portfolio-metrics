@@ -243,16 +243,16 @@ def main():
                 from matplotlib.ticker import MultipleLocator
                 
                 # Find the ES row dynamically based on the tail parameter
-                es_label = f'ES({tail*100:.1f}%)'
+                es_label = f'{tail*100:.1f}% ES ({portfolio.interval})'
                 
                 fig, ax = plt.subplots(figsize=(6.5, 5))
                 x = -summary.loc[es_label] 
-                y = summary.loc['Mean (Ann.)']
+                y = summary.loc['Mean (Annual)']
                 ax.scatter(x=x, y=y, s=100, alpha=0.6)
                 for col in summary.columns:
                     ax.text(x[col], y[col], col, fontsize=9, ha='center', va='bottom')
                 ax.set_xlabel(f'Tail Risk (ES)')
-                ax.set_ylabel('Mean Return (Annualized)')
+                ax.set_ylabel('Mean Return (Annual)')
                 ax.grid(True, alpha=0.3)
                 rf = portfolio.rf
                 ax.axhline(y=rf, color='blue', linestyle='--', linewidth=1, alpha=0.7)
