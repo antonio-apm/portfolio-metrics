@@ -185,8 +185,8 @@ def main():
             
             # Calculate cumulative returns
             cum_rets = prices.apply(lambda x: 100 * (x / x.iloc[0] - 1))
-            portfolio_returns = returns.dot(weights_array)
-            portfolio_cumulative = ((1 + portfolio_returns).cumprod() - 1) * 100
+            portfolio_returns = cum_rets.dot(weights_array) # prev: returns.dot(weights_array)
+            #portfolio_cumulative = ((1 + portfolio_returns).cumprod() - 1) * 100
             
             fig, ax = plt.subplots(figsize=(10, 5))
             cum_rets.plot(
