@@ -52,10 +52,10 @@ def get_risk_free_rate():
     return float(rf) / 100
 
 @st.cache_data(show_spinner=False)
-def compute_portfolio_metrics(tickers, prices, weights, interval, log_returns, tail):
+def compute_portfolio_metrics(tickers, prices, weights, interval, tail):
     portfolio = Portfolio(tickers=tickers, df=prices, weights=weights, interval=interval)
-    summary = portfolio.uni_summary(log=log_returns, tail=tail)
-    returns = portfolio.returns(log=log_returns).dropna()
+    summary = portfolio.uni_summary(tail=tail)
+    returns = portfolio.returns().dropna()
     return portfolio, summary, returns
 
 
@@ -112,7 +112,6 @@ def main():
             help="Optional. Enter comma-separated weights matching the ticker list, for example 0.5,0.3,0.2.",
         )
         st.caption("💡 Default: equal weights across all tickers")
-        log_returns = st.checkbox("Use log returns", value=True)
         tail = st.slider("Tail risk quantile", min_value=0.005, max_value=0.2, value=0.01, step=0.005)
 
     try:
@@ -123,7 +122,6 @@ def main():
             prices=prices,
             weights=weights,
             interval=interval,
-            log_returns=log_returns,
             tail=tail,
         )
     except Exception as exc:
@@ -154,7 +152,7 @@ def main():
             # Capture print output from monte_carlo_ES
             f = io.StringIO()
             with contextlib.redirect_stdout(f):
-                fig, mc_results = portfolio.monte_carlo_ES(n_samples=int(1e5), alpha=0.01)
+                fig, mc_results = portfolio.monte_carlo_ES(n_samples=int(1e5), alpha=tail)
             
             # Display the captured stats
             stats_output = f.getvalue()
@@ -284,7 +282,7 @@ def main():
                 import matplotlib.pyplot as plt
                 import seaborn as sns
                 
-                corr = portfolio.dependence(type="corr", log=log_returns, tail=tail)
+                corr = portfolio.dependence(type="corr", tail=tail)
                 fig, ax = plt.subplots(figsize=(6.5, 5))
                 sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
                 fig.tight_layout()
