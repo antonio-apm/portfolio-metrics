@@ -77,7 +77,7 @@ def parse_weights(raw_weights, tickers):
 
 def main():
     st.title("Portfolio Dashboard")
-    st.caption("Analyze portfolio performance and risk through auto-calibrated simulations, visualizations, and empirical statistics.")
+    st.caption("Analyze portfolio performance and risk through auto-calibrated simulations, stress testing, visualizations, and empirical statistics.")
 
     with st.sidebar:
         st.header("Portfolio inputs")
