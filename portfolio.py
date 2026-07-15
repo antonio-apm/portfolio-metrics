@@ -613,7 +613,7 @@ class Portfolio:
         print(f"What do these risk measures mean?")
         print(f"\t Among the worst {100*alpha:.1f}% of cases, the best-case loss is {-100*var_threshold:.2f}% (the VaR),")
         print(f"\tbut we expect to lose {-100*es_estimate:.2f}% (the ES).")
-        print(f"How good are these estimates (assuming a correctly specified model)?")
+        #print(f"How good are these estimates (assuming a correctly specified model)?")
 
         # These below would be wrong actually! need to apply quantile/CDF version of CLT, not CLT for means/expectations
         #print(f"\tStandard Error of estimated VaR: {100*es_se:.5f}%.")
