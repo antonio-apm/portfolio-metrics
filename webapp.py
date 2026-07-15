@@ -368,24 +368,24 @@ def main():
             r"""
     Let $R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d$ denote the vector
     of portfolio asset returns. Each margin is modeled using a parametric
-    family,
+    family, i.e.
     $$
     R_i \sim F_{\theta_i}, \quad i=1,\ldots,d,
     $$
     where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$.
-    The copula is fitted separately using rank-based pseudo-observations
+    The dependence structure is modeled through a copula, i.e.
     $$
-    \widehat{u}_{ti}
-    =
-    \widehat{F}_{i}^\mathrm{emp}(r_{ti})
-    =
-    \frac{\text{rank}(r_{ti})}{n+1}
+    F_R(r_1,\dots,r_d) = C(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d))^\top
     $$
-    In other words, just for the copula-fitting stage, we use the empirical CDF
-    $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$. The fitted 
-    parametric margins $F_{\widehat{\theta}_i}$ are instead used later to
-    transform simulated copula uniforms back into individual security returns. 
-    Hence, this estimation framework is **semiparametric**.
+    where $C$ is the copula and $F_R:\mathbb{R}^d\rightarrow\mathbb{R}$ is the
+    joint CDF of the random vector $R$. The copula-margins decomposion above is 
+    due to Sklar's theorem. The copula is estimated separately from the fitted margins 
+    using rank-based pseudo-observations. Hence, this estimation framework is **semiparametric**. 
+    In other words, just for the copula-fitting stage, we use the empirical CDF 
+    $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$. The fitted parametric margins 
+    $F_{\widehat{\theta}_i}$ are used later, in the process of Monte Carlo, to transform 
+    simulated copula uniforms back into individual security returns, nd finally 
+    those resulting security returns and transformed into portfolio returns.
     """
         )
 
