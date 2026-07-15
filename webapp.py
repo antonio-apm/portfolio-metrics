@@ -138,11 +138,11 @@ def main():
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
     st.subheader("Monte Carlo Study of Portfolio Tail Risk")
-    st.text("Methodology:") # make this text bold/italic
+    st.markdown("**Methodology:**") 
     st.write(
         "Returns are assumed to be stationary, and are modeled through static probability distributions. " \
         "Marginal distributions are modeled by one of: Student-t, Laplace, GEV, or Normal families. " \
-        "Dependence is modeled by a Student-t or Gaussian copula. The 'best' model is selected based on lowest AIC. " \
+        "Dependence is modeled by a Student-t or Gaussian copula. The 'best' models are chosen based on lowest AIC. " \
         "Individual security returns are jointly simulated using the resulting random vector model, after which the implied portfolio returns are computed using the weights. " \
         "Log returns are used throughout the modeling and then converted back to percentage scale for the ouput."
     )
@@ -350,9 +350,19 @@ def main():
             except Exception as exc:
                 st.warning(f"Correlation matrix unavailable: {exc}")
 
-    st.subheader("Portfolio weights")
-    weights_df = pd.DataFrame({"Ticker": tickers, "Weight": [weights.get(ticker, 0.0) for ticker in tickers]})
-    st.dataframe(weights_df, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col2:
+        st.dataframe(portfolio.get_copula())
+        st.dataframe(portfolio.get_margins())
+    with col3:
+        st.markdown("*More Details on Methodology:*")
+        st.latex(r"Let $R$ be the return random vector taking values in $\mathbb{R}^d$, where $R_i$ is " \ 
+                r"the return for security $i$ in a portfolio of $d$ assets. Each $R_i$ is modeled by a parametric family, i.e. " \
+                r"$R_i\sim F_{\theta_i}$ where $F_{\theta_i$ is a CDF with parameter vector ${\theta_i}$. " \
+                r"To fit the copula model, the empirical CDF $\widehat{F}_i$ of $R_i$ is used for all margins $i=1,\dots,d$ " \
+                r"for converting the data to pseudo-observations, i.e. we don't use the fitted margins for fitting the copula. " \
+                r"In this sense, the estimation framework we implement is \textit{semiparametric}."
+        )
 
 
 if __name__ == "__main__":
