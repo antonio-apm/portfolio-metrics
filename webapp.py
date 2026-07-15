@@ -379,7 +379,7 @@ def main():
     F_R(r_1,\dots,r_d) = C\Big(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d)\Big)
     $$
     $$
-    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)\sim C
+    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)^\top\sim C
     $$
     where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
     The copula is estimated separately from the fitted margins 
@@ -391,9 +391,9 @@ def main():
     those resulting security returns and transformed into portfolio returns. That is, the 
     weighted portfolio return is
     $$
-    R_\mathrm{portfolio} = w^\top R
+    R_\mathrm{portfolio} = w^{\top} R
     $$
-    where $w=(w_1,\dots,w_d)^\T\in\mathbb{R}^d$ is the vector of (fixed) portfolio weights.
+    where $w=(w_1,\dots,w_d)^\top\in\mathbb{R}^d$ is the vector of (fixed) portfolio weights.
     """
         )
 
