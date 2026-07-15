@@ -387,8 +387,12 @@ def main():
     In other words, just for the copula-fitting stage, we use the empirical CDF 
     $\widehat{F_i}^\mathrm{emp}$ to model each margin $i$. The fitted parametric margins 
     $\widehat{F_{\theta_i}}$ are used later, in the process of Monte Carlo, to transform 
-    simulated copula uniforms back into individual security returns, nd finally 
+    simulated copula uniforms back into individual security returns, and finally 
     those resulting security returns and transformed into portfolio returns.
+    $$
+    R_\mathrm{pft} = w^\top R
+    $$
+    where $w=(w_1,\dots,w_d)\in\mathbb{R}^d$ is the vector of (fixed) portfolio weights.
     """
         )
 
