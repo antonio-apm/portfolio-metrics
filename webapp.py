@@ -131,9 +131,10 @@ def main():
     corr = portfolio.dependence(type="corr", tail=tail)
 
     col1, col2, col3 = st.columns([0.8, 0.1, 0.1])
-    col1.text("Tickers", ", ".join(tickers))
-    col2.text("Date range", f"{start_date} → {end_date}")
-    col3.text("Interval", interval)
+    st.markdown("*Portfolio Data:* **(choose inpnuts in sidebar)**")
+    col1.text("Securities:" + ", ".join(tickers))
+    col2.text("Time Range:" + f"{start_date} to {end_date}")
+    col3.text("Time Interval:" + interval)
 
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
