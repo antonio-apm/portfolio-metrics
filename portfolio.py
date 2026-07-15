@@ -14,6 +14,7 @@ import contextlib
 import io
 from copulae import GaussianCopula, StudentCopula
 from scipy.stats import t as student_t, norm, laplace, genextreme
+from copy import deepcopy
 
 
 #------ Helper functions -----------------------------------------------------
@@ -288,6 +289,62 @@ class Portfolio:
         self._margins = pd.DataFrame(results)
         return self._margins
     
+
+    def make_stressed_copula(
+        self,
+        stress_pct,
+        holding="all",
+        log=True,
+        criterion="aic",
+    ):
+        """
+        Return a copy of the fitted copula with uniformly stressed
+        off-diagonal correlations.
+        """
+        if stress_pct < 0:
+            raise ValueError("stress_pct must be non-negative.")
+
+        fitted = self.get_copula(
+            holding=holding,
+            log=log,
+            criterion=criterion,
+        )
+
+        stressed = fitted.copy()
+        stressed_model = deepcopy(fitted["best_model"])
+
+        base_corr = np.asarray(stressed_model.sigma, dtype=float)
+        dimension = base_corr.shape[0]
+        identity = np.eye(dimension)
+
+        factor = 1.0 + stress_pct / 100.0
+
+        # Scale only off-diagonal correlations; keep diagonal equal to one.
+        target_corr = identity + factor * (base_corr - identity)
+
+        # Keep individual entries inside the feasible correlation bounds.
+        target_corr = np.clip(target_corr, -0.999, 0.999)
+        np.fill_diagonal(target_corr, 1.0)
+
+        # Copulae adjusts the matrix if needed to make it positive semidefinite.
+        stressed_model[:] = target_corr
+
+        stressed["best_model"] = stressed_model
+        stressed["best_params"] = extract_params(
+            stressed_model,
+            stressed["best_family"],
+        )
+
+        return stressed
+
+
+    def set_copula(self, copula):
+        self._copula = copula
+
+        # A previously constructed simulator closes over the old model.
+        self.__dict__.pop("_simulator", None)
+    
+
     def copula_fit(self, holding="all", log=True, criterion="aic"):
         """
         Fit a copula to portfolio returns.
@@ -408,7 +465,7 @@ class Portfolio:
                 margins = self._margins
 
         if copula is None:
-            copula = self.get_copula(holding="all", log=True, criterion="aic")
+            copula = self.get_copula(holding=holding, log=True, criterion=criterion)
 
         if holding == "all":
             assets = list(copula.get("assets", self.data.columns))
