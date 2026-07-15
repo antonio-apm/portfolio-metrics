@@ -391,9 +391,9 @@ def main():
     those resulting security returns and transformed into portfolio returns. That is, the 
     weighted portfolio return is
     $$
-    R_\mathrm{pft} = w^\top R
+    R_\mathrm{portfolio} = w^\top R
     $$
-    where $w=(w_1,\dots,w_d)\in\mathbb{R}^d$ is the vector of (fixed) portfolio weights.
+    where $w=(w_1,\dots,w_d)^\T\in\mathbb{R}^d$ is the vector of (fixed) portfolio weights.
     """
         )
 
