@@ -611,7 +611,7 @@ class Portfolio:
         print(f"\t{100*alpha:.0f}% Value-at-Risk (VaR) is {100*var_threshold:.2f}%, and")
         print(f"\t{100*alpha:.0f}% Expected-Shortfall (ES) is {100*es_estimate:.2f}%.")
         print(f"What do these risk measures mean?")
-        print(f"\t Among the worst {100*alpha:.1f}% of cases, the best-case loss is {-100*var_threshold:.2f}% (the VaR),")
+        print(f"\t Among the worst {100*alpha:.0f}% of cases, the best-case loss is {-100*var_threshold:.2f}% (the VaR),")
         print(f"\tbut we expect to lose {-100*es_estimate:.2f}% (the ES).")
         #print(f"How good are these estimates (assuming a correctly specified model)?")
 
