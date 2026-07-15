@@ -133,9 +133,9 @@ def main():
     st.markdown("**Portfolio Data:** \t\t *(choose inpnuts in sidebar)*")
 
     col1, col2, col3 = st.columns(3)
-    col1.text("Securities:" + ", ".join(tickers))
-    col2.text("Time Range:" + f"{start_date} to {end_date}")
-    col3.text("Time Interval:" + interval)
+    col1.text("Securities: " + ", ".join(tickers))
+    col2.text("Time Range: " + f"{start_date} to {end_date}")
+    col3.text("Time Interval: " + interval)
 
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
