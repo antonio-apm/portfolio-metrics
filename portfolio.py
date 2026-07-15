@@ -648,8 +648,8 @@ class Portfolio:
         plt.ylabel("Density")
 
         return fig, pd.DataFrame({
-            "Est": [es_estimate],
-            "SE": [es_se]
+            "Est": [es_estimate]
+            #, "SE": [es_se]
             })
 
 
