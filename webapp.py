@@ -137,7 +137,7 @@ def main():
 
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
-    st.subheader("Monte Carlo Study of Portfolio Tail Risk")
+    st.subheader("Tail Risk Simulation and Tail Dependence Stress Testing")
     st.markdown("**Methodology:**") 
     st.write(
         "Returns are assumed to be stationary, and are modeled through static probability distributions. " \
@@ -146,7 +146,7 @@ def main():
         "Individual security returns are jointly simulated using the resulting random vector model, after which the implied portfolio returns are computed using the weights. " \
         "Log returns are used throughout the modeling and then converted back to percentage scale for the ouput."
     )
-    col1, col2 = st.columns([0.7, 0.3])
+    col1, col2 = st.columns([0.55, 0.45])
     if len(tickers) > 1:
         with col2:
             st.markdown("**Apply Stress to Copula Correlations**")
@@ -158,6 +158,14 @@ def main():
                 value=0,
                 step=1,
                 format="%d%%",
+            )
+            st.markdown(
+"""
+*Technical Notes*
+- This will stress the correlation matrix *parameter* of the *copula* model, not the sample correlations. 
+    - The copula correlation parameters are generally more flexible than the ordinary sample correlations, which only measure linear association.
+- Correlations can only be tweaked such that the matrix remains a valid correlation matrix (i.e. positive semi-definite).
+"""
             )
 
             stressed_copula = portfolio.make_stressed_copula(
