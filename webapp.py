@@ -159,14 +159,6 @@ def main():
                 step=1,
                 format="%d%%",
             )
-            st.markdown(
-"""
-*Technical Notes*
-- This will stress the correlation matrix *parameter* of the *copula* model, not the sample correlations. 
-    - The copula correlation parameters are generally more flexible than the ordinary sample correlations, which only measure linear association.
-- Correlations can only be tweaked such that the matrix remains a valid correlation matrix (i.e. positive semi-definite).
-"""
-            )
 
             stressed_copula = portfolio.make_stressed_copula(
                 stress_pct=stress,
@@ -233,6 +225,14 @@ def main():
         st.info(
             "Monte Carlo copula analysis requires at least two tickers."
         )
+    st.markdown(
+"""
+*Technical Notes*
+- This will stress the correlation matrix *parameter* of the *copula* model, not the sample correlations. 
+    - The copula correlation parameters are generally more flexible than the ordinary sample correlations, which only measure linear association.
+- Correlations can only be tweaked such that the matrix remains a valid correlation matrix (i.e. positive semi-definite).
+"""
+            )
 
 
     st.subheader("Portfolio overview")
