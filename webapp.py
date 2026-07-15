@@ -351,38 +351,59 @@ def main():
                 st.warning(f"Correlation matrix unavailable: {exc}")
 
     col1, col2 = st.columns(2)
-    with col2:
-        st.dataframe(portfolio.get_copula())
-        st.dataframe(portfolio.get_margins())
-    with col3:
+    with col1:
         st.markdown("*More Details on Methodology:*")
         st.markdown(
             r"""
-        Let \(R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d\) denote the vector
-        of portfolio asset returns. Each margin is modeled using a parametric
-        family,
+    Let \(R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d\) denote the vector
+    of portfolio asset returns. Each margin is modeled using a parametric
+    family,
 
-        \[
-        R_i \sim F_{\theta_i}, \qquad i=1,\ldots,d,
-        \]
+    \[
+    R_i \sim F_{\theta_i}, \qquad i=1,\ldots,d,
+    \]
 
-        where \(F_{\theta_i}\) is a CDF parameterized by \(\theta_i\).
+    where \(F_{\theta_i}\) is a CDF parameterized by \(\theta_i\).
 
-        The copula is fitted separately using rank-based pseudo-observations:
+    The copula is fitted separately using rank-based pseudo-observations:
 
-        \[
-        \widehat{u}_{ti}
-        =
-        \widehat{F}_{i,\mathrm{emp}}(r_{ti})
-        =
-        \frac{\operatorname{rank}(r_{ti})}{n+1}.
-        \]
+    \[
+    \widehat{u}_{ti}
+    =
+    \widehat{F}_{i,\mathrm{emp}}(r_{ti})
+    =
+    \frac{\operatorname{rank}(r_{ti})}{n+1}.
+    \]
 
-        Therefore, the fitted parametric margins \(F_{\widehat{\theta}_i}\)
-        are not used to estimate the copula. They are instead used later to
-        transform simulated copula uniforms back into returns. The resulting
-        estimation framework is **semiparametric**.
-        """
+    Therefore, the fitted parametric margins \(F_{\widehat{\theta}_i}\)
+    are not used to estimate the copula. They are instead used later to
+    transform simulated copula uniforms back into returns. The resulting
+    estimation framework is **semiparametric**.
+    """
+        )
+
+    with col2:
+        st.markdown("*Fitted Model Details:*")
+
+        copula_result = portfolio.get_copula()
+
+        st.write(
+            f"Selected copula: **{copula_result['best_family']}** "
+            f"using **{copula_result['criterion'].upper()}**"
+        )
+
+        st.dataframe(
+            copula_result["summary"],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.markdown("**Fitted margins**")
+
+        st.dataframe(
+            portfolio.get_margins(),
+            use_container_width=True,
+            hide_index=True,
         )
 
 

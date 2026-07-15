@@ -289,7 +289,7 @@ class Portfolio:
         self._margins = pd.DataFrame(results)
         return self._margins
     
-    def get_copula(self, holding='all', log=True):
+    def get_margins(self, holding='all', log=True):
         if not hasattr(self, "_margins"):
             return self.margin_fit(holding=holding, log=log)
         else:
@@ -448,9 +448,6 @@ class Portfolio:
             return self._copula
         else:
             return self.copula_fit(holding=holding, log=log, criterion=criterion)
-        
-    def set_copula(self, copula):
-        self._copula = copula 
 
     
     def joint_simulator(self, holding="all", criterion="aic", margins=None, copula=None):
