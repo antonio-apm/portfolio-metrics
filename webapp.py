@@ -352,7 +352,7 @@ def main():
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("*More Details on Methodology:*")
+        st.text("More Details on Methodology")
         st.markdown(
             r"""
     Let $R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d$ denote the vector
@@ -371,25 +371,23 @@ def main():
     \frac{\text{rank}(r_{ti})}{n+1}
     $$
     In other words, just for the copula-fitting stage, we use the empirical CDF
-    $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$, for the purpose of 
-    getting pseudo-observations to estimate dependence strucutre.
-
-    Therefore, the fitted parametric margins $F_{\widehat{\theta}_i}$
-    are not used to estimate the copula. They are instead used later to
+    $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$. The fitted 
+    parametric margins $F_{\widehat{\theta}_i}$ are instead used later to
     transform simulated copula uniforms back into individual security returns. 
     Hence, this estimation framework is **semiparametric**.
     """
         )
 
     with col2:
-        st.markdown("*Fitted Model Details:*")
+        st.text("Fitted Model Details")
 
         copula_result = portfolio.get_copula()
 
         st.write(
-            f"Selected copula: **{copula_result['best_family']}** "
-            f"using **{copula_result['criterion'].upper()}**"
+            f"Selected copula: *{copula_result['best_family']}* "
+            f"using {copula_result['criterion'].upper()}."
         )
+        st.write("Scroll sideways inside the table below to see all columns.")
 
         st.dataframe(
             copula_result["summary"],
@@ -397,8 +395,8 @@ def main():
             hide_index=True,
         )
 
-        st.markdown("**Fitted margins**")
-
+        st.markdown("*Fitted margins*")
+        st.write("Scroll sideways inside the table below to see all columns.")
         st.dataframe(
             portfolio.get_margins(),
             use_container_width=True,
