@@ -356,12 +356,33 @@ def main():
         st.dataframe(portfolio.get_margins())
     with col3:
         st.markdown("*More Details on Methodology:*")
-        st.latex(r"Let $R$ be the return random vector taking values in $\mathbb{R}^d$, where $R_i$ is " \ 
-                r"the return for security $i$ in a portfolio of $d$ assets. Each $R_i$ is modeled by a parametric family, i.e. " \
-                r"$R_i\sim F_{\theta_i}$ where $F_{\theta_i$ is a CDF with parameter vector ${\theta_i}$. " \
-                r"To fit the copula model, the empirical CDF $\widehat{F}_i$ of $R_i$ is used for all margins $i=1,\dots,d$ " \
-                r"for converting the data to pseudo-observations, i.e. we don't use the fitted margins for fitting the copula. " \
-                r"In this sense, the estimation framework we implement is \textit{semiparametric}."
+        st.markdown(
+            r"""
+        Let \(R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d\) denote the vector
+        of portfolio asset returns. Each margin is modeled using a parametric
+        family,
+
+        \[
+        R_i \sim F_{\theta_i}, \qquad i=1,\ldots,d,
+        \]
+
+        where \(F_{\theta_i}\) is a CDF parameterized by \(\theta_i\).
+
+        The copula is fitted separately using rank-based pseudo-observations:
+
+        \[
+        \widehat{u}_{ti}
+        =
+        \widehat{F}_{i,\mathrm{emp}}(r_{ti})
+        =
+        \frac{\operatorname{rank}(r_{ti})}{n+1}.
+        \]
+
+        Therefore, the fitted parametric margins \(F_{\widehat{\theta}_i}\)
+        are not used to estimate the copula. They are instead used later to
+        transform simulated copula uniforms back into returns. The resulting
+        estimation framework is **semiparametric**.
+        """
         )
 
 
