@@ -355,30 +355,29 @@ def main():
         st.markdown("*More Details on Methodology:*")
         st.markdown(
             r"""
-    Let \(R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d\) denote the vector
+    Let $R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d$ denote the vector
     of portfolio asset returns. Each margin is modeled using a parametric
     family,
-
-    \[
-    R_i \sim F_{\theta_i}, \qquad i=1,\ldots,d,
-    \]
-
-    where \(F_{\theta_i}\) is a CDF parameterized by \(\theta_i\).
-
-    The copula is fitted separately using rank-based pseudo-observations:
-
-    \[
+    $$
+    R_i \sim F_{\theta_i}, \quad i=1,\ldots,d,
+    $$
+    where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$.
+    The copula is fitted separately using rank-based pseudo-observations
+    $$
     \widehat{u}_{ti}
     =
-    \widehat{F}_{i,\mathrm{emp}}(r_{ti})
+    \widehat{F}_{i}^\mathrm{emp}(r_{ti})
     =
-    \frac{\operatorname{rank}(r_{ti})}{n+1}.
-    \]
+    \frac{\text{rank}(r_{ti})}{n+1}
+    $$
+    In other words, just for the copula-fitting stage, we use the empirical CDF
+    $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$, for the purpose of 
+    getting pseudo-observations to estimate dependence strucutre.
 
-    Therefore, the fitted parametric margins \(F_{\widehat{\theta}_i}\)
+    Therefore, the fitted parametric margins $F_{\widehat{\theta}_i}$
     are not used to estimate the copula. They are instead used later to
-    transform simulated copula uniforms back into returns. The resulting
-    estimation framework is **semiparametric**.
+    transform simulated copula uniforms back into individual security returns. 
+    Hence, this estimation framework is **semiparametric**.
     """
         )
 
