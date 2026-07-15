@@ -385,7 +385,7 @@ def main():
     The copula is estimated separately from the fitted margins 
     using rank-based pseudo-observations. Hence, this estimation framework is **semiparametric**. 
     In other words, just for the copula-fitting stage, we use the empirical CDF 
-    $\widehat{F_i^\mathrm{emp}}$ to model each margin $i$. The fitted parametric margins 
+    $\widehat{F_i}^\mathrm{emp}$ to model each margin $i$. The fitted parametric margins 
     $\widehat{F_{\theta_i}}$ are used later, in the process of Monte Carlo, to transform 
     simulated copula uniforms back into individual security returns, nd finally 
     those resulting security returns and transformed into portfolio returns.
