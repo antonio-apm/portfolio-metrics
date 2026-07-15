@@ -387,7 +387,6 @@ def main():
             f"Selected copula: *{copula_result['best_family']}* "
             f"using {copula_result['criterion'].upper()}."
         )
-        st.write("Scroll sideways inside the table below to see all columns.")
 
         st.dataframe(
             copula_result["summary"],
@@ -396,7 +395,6 @@ def main():
         )
 
         st.markdown("*Fitted margins*")
-        st.write("Scroll sideways inside the table below to see all columns.")
         st.dataframe(
             portfolio.get_margins(),
             use_container_width=True,
