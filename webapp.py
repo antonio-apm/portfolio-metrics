@@ -352,7 +352,7 @@ def main():
 
     col1, col2 = st.columns(2)
     with col1:
-        st.text("More Details on Methodology")
+        st.subheader("More Details on Methodology")
         st.markdown(
             r"""
     Let $R=(R_1,\ldots,R_d)^\top \in \mathbb{R}^d$ denote the vector
@@ -379,7 +379,7 @@ def main():
         )
 
     with col2:
-        st.text("Fitted Model Details")
+        st.subheader("Fitted Model Details")
 
         copula_result = portfolio.get_copula()
 
