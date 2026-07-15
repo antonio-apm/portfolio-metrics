@@ -130,8 +130,9 @@ def main():
 
     corr = portfolio.dependence(type="corr", tail=tail)
 
+    st.markdown("**Portfolio Data:** *(choose inpnuts in sidebar)*")
+
     col1, col2, col3 = st.columns([0.8, 0.1, 0.1])
-    st.markdown("*Portfolio Data:* **(choose inpnuts in sidebar)**")
     col1.text("Securities:" + ", ".join(tickers))
     col2.text("Time Range:" + f"{start_date} to {end_date}")
     col3.text("Time Interval:" + interval)
