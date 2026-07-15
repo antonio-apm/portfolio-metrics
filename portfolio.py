@@ -288,7 +288,7 @@ class Portfolio:
         self._margins = pd.DataFrame(results)
         return self._margins
     
-    def copula_fit(self, holding="all", log=True, criterion="bic"):
+    def copula_fit(self, holding="all", log=True, criterion="aic"):
         """
         Fit a copula to portfolio returns.
 
@@ -380,6 +380,15 @@ class Portfolio:
         }
         return self._copula
     
+    def get_copula(self, holding="all", log=True, criterion="aic"):
+        if hasattr(self, "_copula"):
+            return self._copula
+        else:
+            return self.copula_fit(holding=holding, log=log, criterion=criterion)
+        
+    def set_copula(self, copula):
+        self._copula = copula 
+    
     def joint_simulator(self, holding="all", criterion="aic", margins=None, copula=None):
         """
         Build and return a callable that simulates joint security returns.
@@ -399,14 +408,7 @@ class Portfolio:
                 margins = self._margins
 
         if copula is None:
-            if not hasattr(self, "_copula"):
-                copula = self.copula_fit(
-                    holding=holding,
-                    log=True,
-                    criterion=criterion
-                )
-            else:
-                copula = self._copula
+            copula = self.get_copula(holding="all", log=True, criterion="aic")
 
         if holding == "all":
             assets = list(copula.get("assets", self.data.columns))

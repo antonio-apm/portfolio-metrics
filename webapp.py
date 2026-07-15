@@ -128,6 +128,8 @@ def main():
         st.error(f"Unable to build the dashboard: {exc}")
         st.stop()
 
+    corr = portfolio.dependence(type="corr", tail=tail)
+
     col1, col2, col3 = st.columns(3)
     col1.metric("Tickers", ", ".join(tickers))
     col2.metric("Date range", f"{start_date} → {end_date}")
@@ -136,6 +138,7 @@ def main():
     weights_array = np.array([weights.get(ticker, 0.0) for ticker in returns.columns])
 
     st.subheader("Monte Carlo Study of Portfolio Tail Risk")
+    st.text("Methodology:") # make this text bold/italic
     st.write(
         "Returns are assumed to be stationary, and are modeled through static probability distributions. " \
         "Marginal distributions are modeled by one of: Student-t, Laplace, GEV, or Normal families. " \
@@ -143,29 +146,61 @@ def main():
         "Individual security returns are jointly simulated using the resulting random vector model, after which the implied portfolio returns are computed using the weights. " \
         "Log returns are used throughout the modeling and then converted back to percentage scale for the ouput."
     )
-    if len(tickers) > 1:
-        try:
-            import matplotlib.pyplot as plt
-            import io
-            import contextlib
-            
-            # Capture print output from monte_carlo_ES
-            f = io.StringIO()
-            with contextlib.redirect_stdout(f):
-                fig, mc_results = portfolio.monte_carlo_ES(n_samples=int(1e5), alpha=tail)
-            
-            # Display the captured stats
-            stats_output = f.getvalue()
-            if stats_output:
-                st.text(stats_output)
-            
-            # Display the figure
-            st.pyplot(fig)
-            plt.close(fig)
-        except Exception as exc:
-            st.error(f"Monte Carlo analysis failed: {exc}")
-    else:
-        st.info("Monte Carlo tail-risk preview requires at least two tickers.")
+    col1, col2 = st.columns([0.7, 0.3])
+    with col2:
+        st.text("Apply Stress to Copula's Correlation Matrix")
+        stress = st.slider("Choose a value to increase the magnitude of the copula model's correlation matrix by a relatve %", 
+                                  min_value=0, max_value=500, value=0, step=1)
+        model_corr = portfolio.get_copula() # get copula corr matrix parameter
+        st.write("The correlation matrix parameter of the copula is generally not equal to the sample correlation matrix.")
+        stressed_corr = model_corr * (1 + stress)
+        if any(np.abs(stressed_corr) > 1):
+            st.write("You increased the magnitude of some correlations above 1, but those will be clipped at 1.")
+            stressed_corr = stressed_corr.apply(lambda x: np.maximum(np.minimum(x, 1), -1), axis=1)
+        st.write("Correlations are scaled uniformly, so positive correlations increase and negative correlations decrease.")
+        st.text("Stressed Correlation Matrix Parameter of Copula")
+        if len(tickers) > 1:
+            try:
+                import matplotlib.pyplot as plt
+                import seaborn as sns
+    
+                fig, ax = plt.subplots(figsize=(6.5, 5))
+                sns.heatmap(stressed_corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
+                fig.tight_layout()
+                st.pyplot(fig)
+                plt.close(fig)
+            except Exception as exc:
+                st.warning(f"Correlation matrix unavailable: {exc}")
+    with col1:
+        st.text("Simulation Results")
+        if len(tickers) > 1:
+            if stress > 0:
+                copula = self.get_copula()
+                copula['best_params']['rho'] = stressed_corr
+                portfolio.set_copula(copula)
+            try:
+                import matplotlib.pyplot as plt
+                import io
+                import contextlib
+                
+                # Capture print output from monte_carlo_ES
+                f = io.StringIO()
+                with contextlib.redirect_stdout(f):
+                    fig, mc_results = portfolio.monte_carlo_ES(n_samples=int(1e5), alpha=tail)
+                
+                # Display the captured stats
+                stats_output = f.getvalue()
+                if stats_output:
+                    st.text(stats_output)
+                
+                # Display the figure
+                st.pyplot(fig)
+                plt.close(fig)
+            except Exception as exc:
+                st.error(f"Monte Carlo analysis failed: {exc}")
+        else:
+            st.info("Monte Carlo tail-risk preview requires at least two tickers.")
+
 
     st.subheader("Portfolio overview")
     st.write(
@@ -282,7 +317,6 @@ def main():
                 import matplotlib.pyplot as plt
                 import seaborn as sns
                 
-                corr = portfolio.dependence(type="corr", tail=tail)
                 fig, ax = plt.subplots(figsize=(6.5, 5))
                 sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, cbar_kws={'label': 'Correlation'}, ax=ax)
                 fig.tight_layout()
