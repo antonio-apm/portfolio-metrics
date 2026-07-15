@@ -373,13 +373,13 @@ def main():
     R_i \sim F_{\theta_i}, \quad i=1,\ldots,d,
     $$
     where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$.
-    The dependence structure is modeled through a copula, i.e.
+    The dependence structure is modeled through a copula $C:\mathbb{R}^d\rightarrow[0,1]$, i.e. 
+    we use the classical decomposition from Sklar's theorem, 
     $$
-    F_R(r_1,\dots,r_d) = C(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d))^\top
+    F_R(r_1,\dots,r_d) = C(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d))
     $$
-    where $C$ is the copula and $F_R:\mathbb{R}^d\rightarrow\mathbb{R}$ is the
-    joint CDF of the random vector $R$. The copula-margins decomposion above is 
-    due to Sklar's theorem. The copula is estimated separately from the fitted margins 
+    where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
+    The copula is estimated separately from the fitted margins 
     using rank-based pseudo-observations. Hence, this estimation framework is **semiparametric**. 
     In other words, just for the copula-fitting stage, we use the empirical CDF 
     $\widehat{F}_{i}^\mathrm{emp}$ to model each margin $i$. The fitted parametric margins 
