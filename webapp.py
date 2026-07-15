@@ -388,7 +388,8 @@ def main():
     $\widehat{F_i}^\mathrm{emp}$ to model each margin $i$. The fitted parametric margins 
     $\widehat{F_{\theta_i}}$ are used later, in the process of Monte Carlo, to transform 
     simulated copula uniforms back into individual security returns, and finally 
-    those resulting security returns and transformed into portfolio returns.
+    those resulting security returns and transformed into portfolio returns. That is, the 
+    weighted portfolio return is
     $$
     R_\mathrm{pft} = w^\top R
     $$
