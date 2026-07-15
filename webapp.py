@@ -373,13 +373,13 @@ def main():
     R_i \sim F_{\theta_i}, \quad i=1,\ldots,d,
     $$
     where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$.
-    The dependence structure is modeled through a copula $C:\mathbb{R}^d\rightarrow[0,1]$, i.e. 
+    The dependence structure is modeled through a copula $C:[0,1]^d\rightarrow[0,1]$, i.e. 
     we use the classical decompositions from Sklar's theorem, 
     $$
     F_R(r_1,\dots,r_d) = C\Big(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d)\Big)
     $$
     $$
-    R \overset{d}{=} \Big( F_{\theta_1}(U_1), \dots, F_{\theta_d}(U_d) \Big) \quad\text{for}\quad U\sim C
+    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)\sim C
     $$
     where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
     The copula is estimated separately from the fitted margins 
