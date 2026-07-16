@@ -283,7 +283,7 @@ def main():
         except Exception as exc:
             st.warning(f"Cumulative returns plot unavailable: {exc}")
     with col2:
-        st.subheader("Returns of Individual Holdings")
+        st.subheader(f" {portfolio.interval} Returns of Individual Holdings")
         try:
             import matplotlib.pyplot as plt
 
@@ -372,16 +372,21 @@ def main():
     $$
     R_i \sim F_{\theta_i}, \quad i=1,\ldots,d,
     $$
-    where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$.
-    The dependence structure is modeled through a copula $C:[0,1]^d\rightarrow[0,1]$, i.e. 
-    we use the classical decompositions from Sklar's theorem, 
+    where $F_{\theta_i}$ is a CDF parameterized by $\theta_i$. 
+
+    The dependence structure is modeled through a copula $C_{\alpha}:[0,1]^d\rightarrow[0,1]$ 
+    parameterized by $\alpha$, using the classical decompositions from Sklar's theorem, 
     $$
-    F_R(r_1,\dots,r_d) = C\Big(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d)\Big)
+    F_R(r_1,\dots,r_d) = C_\alpha\Big(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d)\Big)
     $$
     $$
-    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)^\top\sim C
+    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)^\top\sim C_alpha
     $$
     where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
+    The Gaussian copula just has the correlation matrix parameter $\alpha=P\in[-1,1]^{d\times d}$, 
+    but the Student-t copula also has the degrees of freedom paramter $\nu>0$ so in that case 
+    $\alpha = (\nu, P) \in (0,\infty)\times[-,1,1]^{d\times d} $. The correlation matrix $P$ from 
+    whichever copula is chosen (based on AIC) is the matrix at the top of this page which can be stress tested.
     The copula is estimated separately from the fitted margins 
     using rank-based pseudo-observations. Hence, this estimation framework is **semiparametric**. 
     In other words, just for the copula-fitting stage, we use the empirical CDF 
