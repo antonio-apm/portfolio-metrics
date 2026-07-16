@@ -380,7 +380,7 @@ def main():
     F_R(r_1,\dots,r_d) = C_\alpha\Big(F_{\theta_1}(r_1), \dots, F_{\theta_d}(r_d)\Big)
     $$
     $$
-    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)^\top\sim C_alpha
+    R \overset{d}{=} \Big( F_{\theta_1}^{-1}(U_1), \dots, F_{\theta_d}^{-1}(U_d) \Big) \quad\text{for}\quad U=(U_1,\dots,U_d)^\top\sim C_\alpha
     $$
     where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
     The Gaussian copula just has the correlation matrix parameter $\alpha=P\in[-1,1]^{d\times d}$, 
