@@ -15,6 +15,8 @@ import io
 from copulae import GaussianCopula, StudentCopula
 from scipy.stats import t as student_t, norm, laplace, genextreme
 from copy import deepcopy
+from pandas_datareader import data as pdr
+import statsmodels.api as sm
 
 
 #------ Helper functions -----------------------------------------------------
@@ -161,6 +163,146 @@ class Portfolio:
         }
 
         return pd.DataFrame(results).T
+    
+    def macro_data(
+        self,
+        variables=None,
+        start=None,
+        end=None,
+        frequency="monthly",
+        lag=1,
+        custom_series=None,
+    ):
+        """
+        Download and transform macroeconomic variables from FRED.
+
+        Parameters
+        ----------
+        variables : list[str] or None
+            Names from the built-in specification below. If None, a default
+            macro set is used.
+        start, end : date-like or None
+            Download window. Defaults to the portfolio price-data window.
+        frequency : {"monthly", "quarterly"}
+            Frequency of the returned macro dataset.
+        lag : int, default 1
+            Number of periods by which macro variables are lagged. A lag of
+            one helps avoid using information that was not yet observable
+            when the return was realized.
+        custom_series : dict or None
+            Optional additional specifications of the form
+            {name: {"fred_code": ..., "transform": ...}}. Supported
+            transforms are: level, diff, pct_change, yoy, log_diff,
+            annualized_qoq, and change.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Regression-ready macro variables indexed by period end.
+        """
+        if frequency not in {"monthly", "quarterly"}:
+            raise ValueError("frequency must be 'monthly' or 'quarterly'.")
+        if not isinstance(lag, (int, np.integer)) or lag < 0:
+            raise ValueError("lag must be a non-negative integer.")
+
+        specs = {
+            "Inflation": {"fred_code": "CPIAUCSL", "transform": "yoy"},
+            "CoreInflation": {"fred_code": "CPILFESL", "transform": "yoy"},
+            "GDPGrowth": {"fred_code": "GDPC1", "transform": "annualized_qoq"},
+            "Unemployment": {"fred_code": "UNRATE", "transform": "level"},
+            "UnemploymentChange": {"fred_code": "UNRATE", "transform": "change"},
+            "FedFunds": {"fred_code": "FEDFUNDS", "transform": "level"},
+            "Treasury10Y": {"fred_code": "DGS10", "transform": "level"},
+            "TermSpread": {"fred_code": "T10Y2Y", "transform": "level"},
+            "BAASpread": {"fred_code": "BAA10Y", "transform": "level"},
+            "VIX": {"fred_code": "VIXCLS", "transform": "level"},
+            "IndustrialProductionGrowth": {"fred_code": "INDPRO", "transform": "yoy"},
+            "RetailSalesGrowth": {"fred_code": "RSAFS", "transform": "yoy"},
+        }
+        if custom_series is not None:
+            specs.update(custom_series)
+
+        if variables is None:
+            variables = [
+                "Inflation",
+                "GDPGrowth",
+                "Unemployment",
+                "FedFunds",
+                "Treasury10Y",
+                "TermSpread",
+                "BAASpread",
+                "VIX",
+            ]
+        elif isinstance(variables, str):
+            variables = [variables]
+        else:
+            variables = list(variables)
+
+        unknown = [name for name in variables if name not in specs]
+        if unknown:
+            raise ValueError(
+                f"Unknown macro variables: {unknown}. Available variables are "
+                f"{sorted(specs)}."
+            )
+
+        price_index = pd.DatetimeIndex(self.data.index)
+        start = pd.Timestamp(start) if start is not None else price_index.min()
+        end = pd.Timestamp(end) if end is not None else price_index.max()
+
+        # Pull enough pre-sample history to compute year-over-year changes.
+        download_start = start - pd.DateOffset(months=15)
+        codes = list(dict.fromkeys(specs[name]["fred_code"] for name in variables))
+        raw = pdr.DataReader(codes, "fred", download_start, end)
+        raw.index = pd.to_datetime(raw.index)
+
+        rule = "ME" if frequency == "monthly" else "QE"
+        periods_per_year = 12 if frequency == "monthly" else 4
+        out = {}
+
+        for name in variables:
+            spec = specs[name]
+            series = raw[spec["fred_code"]].astype(float)
+            transform = spec.get("transform", "level").lower()
+
+            # Convert the source series to the requested observation frequency.
+            # Taking the last available value avoids averaging rates and indexes.
+            series = series.resample(rule).last().ffill()
+
+            if transform == "level":
+                transformed = series
+            elif transform in {"diff", "change"}:
+                transformed = series.diff()
+            elif transform == "pct_change":
+                transformed = 100.0 * series.pct_change()
+            elif transform == "yoy":
+                transformed = 100.0 * series.pct_change(periods_per_year)
+            elif transform == "log_diff":
+                transformed = 100.0 * np.log(series).diff()
+            elif transform == "annualized_qoq":
+                # Real GDP is quarterly. Reconstruct quarterly growth first,
+                # annualize it, then carry it to monthly rows if requested.
+                quarterly = raw[spec["fred_code"]].astype(float).resample("QE").last()
+                quarterly_growth = 100.0 * ((quarterly / quarterly.shift(1)) ** 4 - 1.0)
+                if frequency == "quarterly":
+                    transformed = quarterly_growth
+                else:
+                    transformed = quarterly_growth.resample("ME").ffill()
+            else:
+                raise ValueError(
+                    f"Unsupported transform '{transform}' for variable '{name}'."
+                )
+
+            out[name] = transformed
+
+        macro = pd.DataFrame(out).sort_index()
+        macro = macro.loc[(macro.index >= start) & (macro.index <= end)]
+        macro = macro.shift(lag)
+        macro.index.name = "Date"
+
+        self._macro_data = macro
+        self._macro_frequency = frequency
+        self._macro_lag = lag
+        return macro
 
 
     def dependence(self, type="corr", holding="all", log=True, tail=0.05):
