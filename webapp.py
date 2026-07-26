@@ -410,9 +410,9 @@ def main():
 
         copula_result = portfolio.get_copula()
 
+        st.markdown("*Fitted Copulas")
         st.write(
-            f"Selected copula: *{copula_result['best_family']}* "
-            f"using {copula_result['criterion'].upper()}."
+            f"Selected {copula_result['best_family']} copula."
         )
 
         st.dataframe(
@@ -421,9 +421,16 @@ def main():
             hide_index=True,
         )
 
-        st.markdown("*Fitted margins*")
+        st.markdown("*Fitted Margins*")
+        margins_display = (
+            portfolio.get_margins()
+            .set_index("Asset")
+            .T
+            .reset_index()
+            .rename(columns={"index": "Metric"})
+        )
         st.dataframe(
-            portfolio.get_margins(),
+            margins_display,
             use_container_width=True,
             hide_index=True,
         )
