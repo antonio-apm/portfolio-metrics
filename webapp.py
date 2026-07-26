@@ -410,9 +410,9 @@ def main():
 
         copula_result = portfolio.get_copula()
 
-        st.markdown("*Fitted Copulas")
+        st.markdown("*Fitted Copula*")
         st.write(
-            f"Selected {copula_result['best_family']} copula."
+            f"Selected {copula_result['best_family']} copula. Scroll sideways in the table to see all columns."
         )
 
         st.dataframe(
@@ -421,7 +421,8 @@ def main():
             hide_index=True,
         )
 
-        st.markdown("*Fitted Margins*")
+        st.markdown("*Fitted Margins**")
+        st.wrtie("The selected model is (likely) different for different securities. Scroll sideways in the table to see all columns.")
         margins_display = (
             portfolio.get_margins()
             .set_index("Asset")
