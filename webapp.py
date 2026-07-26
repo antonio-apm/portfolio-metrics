@@ -146,8 +146,9 @@ def main():
         "Marginal distributions are modeled by one of: Student-t, Laplace, GEV, or Normal families. " \
         "Dependence is modeled by a Student-t or Gaussian copula. The 'best' models are chosen based on lowest AIC. " \
         "Individual security returns are jointly simulated using the resulting random vector model, after which the implied portfolio returns are computed using the weights. " \
-        "Log returns are used throughout the modeling and then converted back to percentage scale for the ouput."
+        "Log returns are used throughout the modeling and then converted back to percentage scale for the ouput. "
     )
+    st.markdown("*More details on methodology at bottom of page.*")
     col1, col2 = st.columns([0.55, 0.45])
     if len(tickers) > 1:
         with col2:
@@ -238,7 +239,7 @@ def main():
             )
 
 
-    st.subheader("Portfolio overview")
+    st.subheader("Overview of Historical Portfolio Characteristics")
     st.write(
         "The following tabs show various descriptive statistics using the empirical portfolio data."
     )
@@ -262,7 +263,7 @@ def main():
             fig, ax = plt.subplots(figsize=(10, 5))
             cum_rets.plot(
                 ax=ax,
-                title="Cumulative Returns: Individual Holdings vs Portfolio",
+                title="Cumulative Returns (Individual Holdings & Portfolio)",
                 xlabel="Date",
                 ylabel="Cumulative Return (%)",
                 alpha=0.5,
@@ -283,7 +284,7 @@ def main():
         except Exception as exc:
             st.warning(f"Cumulative returns plot unavailable: {exc}")
     with col2:
-        st.subheader(f" {portfolio.interval} Returns of Individual Holdings")
+        st.subheader(f"{portfolio.interval} Returns of Individual Holdings")
         try:
             import matplotlib.pyplot as plt
 
