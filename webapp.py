@@ -235,7 +235,8 @@ def main():
     - Generally, the copula allows for a much more flexible dependence model than the pearson correlation matrix of the sample, which only measures linear association.
 - Correlations can only be tweaked such that the matrix remains a valid correlation matrix (i.e. positive semi-definite).
     - The stressed matrix is auto-adjusted so that it is valid.
-- The simulated mean return 
+- Analytically, we know the mean return is constant with respect to the copula's correlation matrix. It may change as the simulation is re-run, but this is just noise. 
+    - To see historical mean return (annualized) along with other useful stats (e.g. sortino ratio), scroll down.
 """
             )
 
