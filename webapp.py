@@ -388,7 +388,7 @@ def main():
     where $F_R:\mathbb{R}^d\rightarrow[0,1]$ is the joint CDF of the random vector $R$. 
     The Gaussian copula just has the correlation matrix parameter $\alpha=P\in[-1,1]^{d\times d}$, 
     but the Student-t copula also has the degrees of freedom paramter $\nu>0$ so in that case 
-    $\alpha = (\nu, P) \in (0,\infty)\times[-,1,1]^{d\times d} $. The correlation matrix $P$ from 
+    $\alpha = (\nu, P) \in (0,\infty)\times[-1,1]^{d\times d} $. The correlation matrix $P$ from 
     whichever copula is chosen (based on AIC) is the matrix at the top of this page which can be stress tested.
     The copula is estimated separately from the fitted margins 
     using rank-based pseudo-observations. Hence, this estimation framework is **semiparametric**. 
