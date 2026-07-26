@@ -422,13 +422,15 @@ def main():
         )
 
         st.markdown("*Fitted Margins**")
-        st.wrtie("The selected model is (likely) different for different securities. Scroll sideways in the table to see all columns.")
+        st.write(
+            "The selected model is (likely) different for different securities. Scroll sideways in the table to see all columns."
+            )
         margins_display = (
             portfolio.get_margins()
-            .set_index("Asset")
+            .set_index("asset")
             .T
             .reset_index()
-            .rename(columns={"index": "Metric"})
+            .rename(columns={"index": "family"})
         )
         st.dataframe(
             margins_display,
