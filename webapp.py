@@ -201,7 +201,7 @@ def main():
 
         with col1:
             st.markdown("**Simulation Results**")
-
+            st.markdown(f"All Monte Carlo estimates below are quoted on a {portfolio.interval} basis.")
             try:
                 import contextlib
                 import io
@@ -235,6 +235,7 @@ def main():
     - Generally, the copula allows for a much more flexible dependence model than the pearson correlation matrix of the sample, which only measures linear association.
 - Correlations can only be tweaked such that the matrix remains a valid correlation matrix (i.e. positive semi-definite).
     - The stressed matrix is auto-adjusted so that it is valid.
+- The simulated mean return 
 """
             )
 
