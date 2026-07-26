@@ -1,3 +1,3 @@
 # portfolio-metrics
 
-web app: https://portfoliometrics-dashboard.streamlit.app
+visit the website: https://portfoliometrics-dashboard.streamlit.app
