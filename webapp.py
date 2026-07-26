@@ -421,13 +421,13 @@ def main():
             hide_index=True,
         )
 
-        st.markdown("*Fitted Margins**")
+        st.markdown("*Fitted Margins*")
         st.write(
             "The selected model is (likely) different for different securities. Scroll sideways in the table to see all columns."
             )
         margins_display = (
             portfolio.get_margins()
-            .set_index("asset")
+            .set_index("Asset")
             .T
             .reset_index()
             .rename(columns={"index": "family"})
